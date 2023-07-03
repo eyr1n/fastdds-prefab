@@ -1,0 +1,6 @@
+{
+  "schema_version": 2,
+  "name": "fastdds-prefab",
+  "version": "@CMAKE_PROJECT_VERSION@",
+  "dependencies": []
+}

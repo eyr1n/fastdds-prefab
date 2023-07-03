@@ -1,0 +1,6 @@
+{
+  "abi": "@android_abi@",
+  "api": @MIN_SDK_VERSION@,
+  "ndk": @MIN_SDK_VERSION@,
+  "stl": "c++_shared"
+}

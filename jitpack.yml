@@ -1,0 +1,3 @@
+install:
+  - mkdir -p ~/.m2/repository
+  - cp -R maven/* ~/.m2/repository/
