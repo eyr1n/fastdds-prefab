@@ -1,11 +1,14 @@
 cmake_minimum_required(VERSION 3.22.1)
-project(fastdds-prefab VERSION 2.13.4)
+project(fastdds-prefab VERSION 2.13.4.2)
 
 # Config
 set(MIN_SDK_VERSION 24)
+set(MAVEN_GROUP_ID io.github.eyr1n)
+string(REPLACE "." "/" MAVEN_GROUP_ID_SLASH ${MAVEN_GROUP_ID})
+string(REPLACE "-" "_" PROJECT_NAME_UNDERSCORE ${PROJECT_NAME})
 
-set(android_aar_name fastdds-prefab-${CMAKE_PROJECT_VERSION})
-set(prefab_modules_dir ${CMAKE_CURRENT_BINARY_DIR}/${android_aar_name}/prefab/modules)
+set(PREFAB_MODULES_DIR ${CMAKE_CURRENT_BINARY_DIR}/prefab/modules)
+set(MAVEN_BUNDLE_DIR ${CMAKE_CURRENT_BINARY_DIR}/maven/${MAVEN_GROUP_ID_SLASH}/${PROJECT_NAME}/${PROJECT_VERSION})
 
 include(ExternalProject)
 
@@ -44,13 +47,13 @@ function(build_with_abi android_abi)
   )
   install(
     DIRECTORY   ${ext_install_dir}/Fast-CDR/include
-    DESTINATION ${prefab_modules_dir}/fastcdr/libs/android.${android_abi}
+    DESTINATION ${PREFAB_MODULES_DIR}/fastcdr/libs/android.${android_abi}
   )
   install(
     FILES
       ${ext_install_dir}/Fast-CDR/lib/libfastcdr.so
       ${CMAKE_CURRENT_BINARY_DIR}/${android_abi}/abi.json
-    DESTINATION ${prefab_modules_dir}/fastcdr/libs/android.${android_abi}
+    DESTINATION ${PREFAB_MODULES_DIR}/fastcdr/libs/android.${android_abi}
   )
 
   # Fast-DDS
@@ -73,19 +76,19 @@ function(build_with_abi android_abi)
   )
   install(
     DIRECTORY   ${ext_install_dir}/Fast-DDS/include
-    DESTINATION ${prefab_modules_dir}/fastrtps/libs/android.${android_abi}
+    DESTINATION ${PREFAB_MODULES_DIR}/fastrtps/libs/android.${android_abi}
   )
   install(
     FILES
       ${ext_install_dir}/Fast-DDS/lib/libfastrtps.so
       ${CMAKE_CURRENT_BINARY_DIR}/${android_abi}/abi.json
-    DESTINATION ${prefab_modules_dir}/fastrtps/libs/android.${android_abi}
+    DESTINATION ${PREFAB_MODULES_DIR}/fastrtps/libs/android.${android_abi}
   )
 endfunction()
 
-configure_file(fastdds-prefab.pom.in ${android_aar_name}.pom @ONLY)
-configure_file(prefab.json.in ${android_aar_name}/prefab/prefab.json @ONLY)
-install(FILES AndroidManifest.xml DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/${android_aar_name})
+configure_file(${PROJECT_NAME}.pom.in ${MAVEN_BUNDLE_DIR}/${PROJECT_NAME}-${PROJECT_VERSION}.pom @ONLY)
+configure_file(AndroidManifest.xml.in AndroidManifest.xml @ONLY)
+configure_file(prefab.json.in prefab/prefab.json @ONLY)
 
 build_with_abi(arm64-v8a)
 build_with_abi(x86_64)
@@ -94,17 +97,39 @@ build_with_abi(x86_64)
 install(CODE
   "execute_process(
     COMMAND
-      ${CMAKE_COMMAND} -E tar cvf ${CMAKE_CURRENT_BINARY_DIR}/${android_aar_name}.aar --format=zip
-      prefab AndroidManifest.xml
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${android_aar_name}
+      ${CMAKE_COMMAND} -E tar cvf ${MAVEN_BUNDLE_DIR}/${PROJECT_NAME}-${PROJECT_VERSION}.aar --format=zip
+      AndroidManifest.xml prefab
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   )"
 )
 
-# Create Maven package
+# Sign
+install(CODE
+  "execute_process(
+    COMMAND gpg --batch --yes -ab ${PROJECT_NAME}-${PROJECT_VERSION}.pom
+    COMMAND gpg --batch --yes -ab ${PROJECT_NAME}-${PROJECT_VERSION}.aar
+    WORKING_DIRECTORY ${MAVEN_BUNDLE_DIR}
+  )"
+)
+
+# Checksum
+install(CODE
+  "file(MD5 ${MAVEN_BUNDLE_DIR}/${PROJECT_NAME}-${PROJECT_VERSION}.pom POM_MD5)
+  file(WRITE ${MAVEN_BUNDLE_DIR}/${PROJECT_NAME}-${PROJECT_VERSION}.pom.md5 \${POM_MD5})
+  file(SHA1 ${MAVEN_BUNDLE_DIR}/${PROJECT_NAME}-${PROJECT_VERSION}.pom POM_SHA1)
+  file(WRITE ${MAVEN_BUNDLE_DIR}/${PROJECT_NAME}-${PROJECT_VERSION}.pom.sha1 \${POM_SHA1})
+
+  file(MD5 ${MAVEN_BUNDLE_DIR}/${PROJECT_NAME}-${PROJECT_VERSION}.aar AAR_MD5)
+  file(WRITE ${MAVEN_BUNDLE_DIR}/${PROJECT_NAME}-${PROJECT_VERSION}.aar.md5 \${AAR_MD5})
+  file(SHA1 ${MAVEN_BUNDLE_DIR}/${PROJECT_NAME}-${PROJECT_VERSION}.aar AAR_SHA1)
+  file(WRITE ${MAVEN_BUNDLE_DIR}/${PROJECT_NAME}-${PROJECT_VERSION}.aar.sha1 \${AAR_SHA1})"
+)
+
+# Create Maven bundle
 install(CODE
   "execute_process(
     COMMAND
-      ${CMAKE_COMMAND} -E tar cvf ${CMAKE_CURRENT_BINARY_DIR}/${android_aar_name}.zip --format=zip
-      ${android_aar_name}.aar ${android_aar_name}.pom
+      ${CMAKE_COMMAND} -E tar cvf ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-${PROJECT_VERSION}.zip --format=zip .
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/maven
   )"
 )

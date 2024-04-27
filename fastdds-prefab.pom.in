@@ -2,8 +2,36 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>jp.eyrin</groupId>
-  <artifactId>fastdds-prefab</artifactId>
-  <version>@CMAKE_PROJECT_VERSION@</version>
+  <groupId>@MAVEN_GROUP_ID@</groupId>
+  <artifactId>@PROJECT_NAME@</artifactId>
+  <version>@PROJECT_VERSION@</version>
   <packaging>aar</packaging>
+
+  <name>@PROJECT_NAME@</name>
+  <description>Prebuilt Fast DDS binary for Android Prefab.</description>
+  <url>https://github.com/eyr1n/fastdds-prefab</url>
+
+  <licenses>
+    <license>
+      <name>The Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>eProsima</id>
+      <name>Proyectos y Sistemas de Mantenimiento SL</name>
+      <email>support@eprosima.com</email>
+    </developer>
+    <developer>
+      <id>eyr1n</id>
+      <name>Rin Iwai</name>
+      <email>rin@eyrin.jp</email>
+    </developer>
+  </developers>
+
+  <scm>
+    <url>https://github.com/eyr1n/fastdds-prefab.git</url>
+  </scm>
 </project>
