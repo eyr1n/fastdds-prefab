@@ -17,6 +17,7 @@ function(build_with_abi android_abi)
   set(ext_install_dir ${CMAKE_CURRENT_BINARY_DIR}/${android_abi}/install)
   set(android_cmake_args
     -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
+    -DCMAKE_BUILD_TYPE=Release
     -DANDROID_ABI=${android_abi}
     -DANDROID_PLATFORM=android-${MIN_SDK_VERSION}
     -DANDROID_STL=c++_shared
