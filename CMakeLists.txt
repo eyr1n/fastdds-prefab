@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22.1)
-project(fastdds-prefab VERSION 2.13.4.2)
+project(fastdds-prefab VERSION 2.13.4.3)
 
 # Config
 set(MIN_SDK_VERSION 24)
