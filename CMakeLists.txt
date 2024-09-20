@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22.1)
-project(fastdds-prefab VERSION 2.13.4.3)
+project(fastdds-prefab VERSION 3.0.1)
 
 # Config
 set(MIN_SDK_VERSION 24)
@@ -39,7 +39,7 @@ function(build_with_abi android_abi)
   # Fast-CDR
   ExternalProject_Add(Fast-CDR_${android_abi}
     GIT_REPOSITORY  https://github.com/eProsima/Fast-CDR.git
-    GIT_TAG         v2.2.1
+    GIT_TAG         v2.2.4
     PREFIX          ${android_abi}
     CMAKE_ARGS
       -DCMAKE_INSTALL_PREFIX=${ext_install_dir}/Fast-CDR
@@ -60,7 +60,7 @@ function(build_with_abi android_abi)
   # Fast-DDS
   ExternalProject_Add(Fast-DDS_${android_abi}
     GIT_REPOSITORY  https://github.com/eProsima/Fast-DDS.git
-    GIT_TAG         v2.13.4
+    GIT_TAG         v3.0.1
     PREFIX          ${android_abi}
     DEPENDS         foonathan_memory_vendor_${android_abi} Fast-CDR_${android_abi}
     LIST_SEPARATOR |
@@ -77,13 +77,13 @@ function(build_with_abi android_abi)
   )
   install(
     DIRECTORY   ${ext_install_dir}/Fast-DDS/include
-    DESTINATION ${PREFAB_MODULES_DIR}/fastrtps/libs/android.${android_abi}
+    DESTINATION ${PREFAB_MODULES_DIR}/fastdds/libs/android.${android_abi}
   )
   install(
     FILES
-      ${ext_install_dir}/Fast-DDS/lib/libfastrtps.so
+      ${ext_install_dir}/Fast-DDS/lib/libfastdds.so
       ${CMAKE_CURRENT_BINARY_DIR}/${android_abi}/abi.json
-    DESTINATION ${PREFAB_MODULES_DIR}/fastrtps/libs/android.${android_abi}
+    DESTINATION ${PREFAB_MODULES_DIR}/fastdds/libs/android.${android_abi}
   )
 endfunction()
 
